@@ -4,36 +4,41 @@
 #    -c mp3 -od Extracts -op '${out_dir}/${unit}-${section}-${dialog}.${codec}'
 
 function print_help {
-	usage="$(basename "${prog_name}") [-h] [-s n] -- extract a shadowing dialog from an audio file
+	usage="$(basename "${prog_name}") [[infile options] -id indir]... [[outfile options] -od outdir]...  COORDINATES
+	extract a shadowing dialog from an audio file, where COORDINATES are the coordinates of the dialog in the format 'UNIT-SECTION-DIALOG' (eg: 1-5-2)
 
 where:
     -h  show this help text
-    -s  start time of the dialog to extract (in fractional seconds)
-    -e  end time of the dialog to extract (in fractional seconds)
-    -d  coordinate of the dialog in the format 'UNIT-SECTION-DIALOG' (eg: 1-5-2)
-    -id directory of the input shadowing audio file
+    -s  start time of the dialog to extract (in fractional seconds, default: beginning of input file)
+    -e  end time of the dialog to extract (in fractional seconds, default: end of input file)
+    -id directory of the input shadowing audio file (default: 'inputs')
     -ip pattern of the input shadowing audio file. It can use 'unit' and 'section' variables 
-        (eg: *_Unit_${unit}_-_Section_${section}.mp3)
+        (default: '*_Unit_${unit}_-_Section_${section}.mp3')
     -c  codec of the extracted dialog audio file (default: mp3)
-    -od directory to output the dialog file
+    -od directory to output the dialog file (default: 'outputs')
     -op pattern of the extracted dialog audio file. 
-        It can use 'out_dir', 'unit', 'section', 'dialog' and 'codec' variables.
-        (default: '${out_dir}/${unit}-${section}-${dialog}.${codec}')
+        It can use 'unit', 'section', 'dialog' and 'codec' variables.
+        (default: '${unit}-${section}-${dialog}.${codec}')
     "
 	echo "${usage}"
 }
 
 function param_error {
-	echo "$0" >&2
+	echo "${1}" >&2
 	print_help >&2
 	exit 1
 }
 
-prog_name=$0
+prog_name=${0}
+
+input_dir="inputs"
+input_pattern='*_Unit_${unit}_-_Section_${section}.mp3'
+codec="mp3"
+output_dir="outputs"
+output_pattern='${unit}-${section}-${dialog}.${codec}'
 
 # TODO use silent mode when debug is done (prefix by ":"")
-while getopts "hs:e:d:i:p:c:o:" opt; do
-	shift $((OPTIND-1))
+while getopts ":hs:e:i:p:c:o:P:" opt; do
 	case $opt in
 		h)
 			print_help
@@ -45,23 +50,20 @@ while getopts "hs:e:d:i:p:c:o:" opt; do
 		e)
 			end_time="${OPTARG}"
 			;;
-		d)
-			coordinate_expr="${OPTARG}"
+		i)
+			input_dir="${OPTARG}"
 			;;
-		id)
-			source_dir="${OPTARG}"
-			;;
-		ip)
-			file_pattern="${OPTARG}"
+		p)
+			input_pattern="${OPTARG}"
 			;;
 		c)
 			codec="${OPTARG}"
 			;;
-		od)
-			out_dir="${OPTARG}"
+		o)
+			output_dir="${OPTARG}"
 			;;
-		op)
-			out_file="${OPTARG}"
+		P)
+			output_pattern="${OPTARG}"
 			;;
 		\?)
 			param_error "Invalid option: -${OPTARG}."
@@ -71,6 +73,25 @@ while getopts "hs:e:d:i:p:c:o:" opt; do
 			;;
 	esac
 done
+
+shift $((OPTIND-1))
+
+coordinate_expr="${1}"
+if [ -z "${coordinate_expr}" ]; then
+    param_error "'COORDINATES' positional parameter needs to be set."
+fi
+
+echo "start_time: '${start_time}'"
+echo "end_time: '${end_time}'"
+echo "coordinate_expr: '${coordinate_expr}'"
+echo "input_dir: '${input_dir}'"
+echo "input_pattern: '${input_pattern}'"
+echo "codec: '${codec}'"
+echo "output_dir: '${output_dir}'"
+echo "output_pattern: '${output_pattern}'"
+
+
+
 
 # source_dir="Audio"
 # start_time="9.9461767555"
@@ -88,4 +109,4 @@ done
 # out_file="${out_dir}/${unit}-${section}-${dialog}.${codec}"
 
 
-# ffmpeg -ss ${start_time} -t ${duration} -acodec ${codec} -i ${source_file} ${out_file}
+# ffmpeg -ss ${start_time} -to ${duration} -acodec ${codec} -i ${source_file} ${out_file}
