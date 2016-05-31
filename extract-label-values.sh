@@ -6,7 +6,8 @@
 # * extract the start, end and title of each label found
 # * concatenate the file base name and title, to form a dialog coordinate
 # * display coordinates and timing to `stdout`.
-# The script works on a single file name, given as argument or through `stdin`.
+#
+# The script works on one or multiple file names, given as argument or through `stdin`.
 #
 # Example `2-1.aup` file:
 # <?xml version="1.0" standalone="no" ?>
@@ -44,6 +45,7 @@ function extract_label_values {
 	done <<< "${labels}"
 }
 
+# This script accepts one or multiple file names as arguments or through stdin.
 # If we have arguments, iterate over them.
 # Otherwise, iterate over each line of stdin.
 if [ $# -ge 1 -a -f "$1" ]; then
