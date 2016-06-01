@@ -32,16 +32,20 @@
 # TODO better name for this function
 function extract_label_values {
 	full_path="$1"
-	unit=$(basename "${full_path}" ".aup")
+	page=$(basename "${full_path}" ".aup")
+	IFS='-' read -ra page_elements <<< "${page}"
+	unit="${page_elements[0]}"
+	section="${page_elements[1]}"
 
 	# Extract all label nodes and insert newline between them
-	labels=$(xmllint --xpath "//*[local-name()='labeltrack']/*[local-name()='label']" ${full_path} | sed 's%><%>\n<%g')
+	labels=$(xmllint --xpath "//*[local-name()='labeltrack']/*[local-name()='label']" ${full_path} | \
+			sed 's%><%>\n<%g')
 
 	# Extract t, t1 and title from the label node and display them alongside the unit
 	# one group per line
 	while read -r line; do
-	  read t t1 title <<<$(echo ${line} | grep -oP '"\K(\d+\.?\d*)')
-	  echo ${unit}-${title} ${t} ${t1}
+		read start end dialog <<<$(echo ${line} | grep -oP '"\K(\d+\.?\d*)')
+		echo ${unit} ${section} ${dialog} ${start} ${end}
 	done <<< "${labels}"
 }
 
