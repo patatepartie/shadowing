@@ -12,12 +12,12 @@ where:
     -h  show this help text
     -s  start time of the dialog to extract (in fractional seconds, default: beginning of input file)
     -e  end time of the dialog to extract (in fractional seconds, default: end of input file)
-    -id directory of the input shadowing audio file (default: 'inputs')
-    -ip pattern of the input shadowing audio file. It can use 'unit' and 'section' variables 
+    -i directory of the input shadowing audio file (default: 'inputs')
+    -p pattern of the input shadowing audio file. It can use 'unit' and 'section' variables 
         (default: '*_Unit_${unit}_-_Section_${section}.mp3')
     -c  codec of the extracted dialog audio file (default: mp3)
-    -od directory to output the dialog file (default: 'outputs')
-    -op pattern of the extracted dialog audio file. 
+    -o directory to output the dialog file (default: 'outputs')
+    -P pattern of the extracted dialog audio file. 
         It can use 'unit', 'section', 'dialog' and 'codec' variables.
         (default: '${unit}-${section}-${dialog}.${codec}')
     "
