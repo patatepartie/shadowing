@@ -4,8 +4,8 @@
 #    -c mp3 -od Extracts -op '${out_dir}/${unit}-${section}-${dialog}.${codec}'
 
 function print_help {
-	usage="$(basename "${prog_name}") [[infile options] -id indir]... [[outfile options] -od outdir]...  COORDINATES
-	extract a shadowing dialog from an audio file, where COORDINATES are the coordinates of the dialog in the format 'UNIT-SECTION-DIALOG' (eg: 1-5-2)
+	usage="$(basename "${prog_name}") [[infile options] -id indir]... [[outfile options] -od outdir]...  UNIT SECTION DIALOG
+	extract a specific shadowing dialog from an audio file, by its coordinates: UNIT, SECTION and DIALOG
 
 where:
     -h  show this help text
@@ -38,7 +38,7 @@ output_dir="outputs"
 output_pattern='${unit}-${section}-${dialog}.${codec}'
 
 # TODO use silent mode when debug is done (prefix by ":"")
-while getopts ":hs:e:i:p:c:o:P:" opt; do
+while getopts "hs:e:i:p:c:o:P:" opt; do
 	case $opt in
 		h)
 			print_help
@@ -76,14 +76,17 @@ done
 
 shift $((OPTIND-1))
 
-coordinate_expr="${1}"
-if [ -z "${coordinate_expr}" ]; then
-    param_error "'COORDINATES' positional parameter needs to be set."
+unit="${1}"
+section="${2}"
+dialog="${3}"
+
+if [ -z "${unit}" ] || [ -z "${section}" ] || [ -z "${dialog}" ]; then
+    param_error "3 positional parameters needs to be set: UNIT SECTION DIALOG."
 fi
 
 echo "start_time: '${start_time}'"
 echo "end_time: '${end_time}'"
-echo "coordinate_expr: '${coordinate_expr}'"
+echo "coordinate_expr: '${unit} ${section} ${dialog}'"
 echo "input_dir: '${input_dir}'"
 echo "input_pattern: '${input_pattern}'"
 echo "codec: '${codec}'"
