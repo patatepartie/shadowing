@@ -5,7 +5,8 @@
 
 function print_help {
 	usage="$(basename "${prog_name}") [[infile options] -id indir]... [[outfile options] -od outdir]...  UNIT SECTION DIALOG
-	extract a specific shadowing dialog from an audio file, by its coordinates: UNIT, SECTION and DIALOG
+	extract a sample of an audio file, and name it based on its coordinates: UNIT, SECTION and DIALOG.
+	The coordinates and the file path will be output.
 
 where:
     -h  show this help text
@@ -84,17 +85,9 @@ if [ -z "${unit}" ] || [ -z "${section}" ] || [ -z "${dialog}" ]; then
     param_error "3 positional parameters needs to be set: UNIT SECTION DIALOG."
 fi
 
-echo "start_time: '${start_time}'"
-echo "end_time: '${end_time}'"
-echo "coordinate_expr: '${unit} ${section} ${dialog}'"
-echo "input_dir: '${input_dir}'"
-echo "input_pattern: '${input_pattern}'"
-echo "codec: '${codec}'"
-echo "output_dir: '${output_dir}'"
-echo "output_pattern: '${output_pattern}'"
+eval out_path="${output_dir}/${output_pattern}"
 
-
-
+echo "${unit}-${section}-${dialog},${out_path}"
 
 # source_dir="Audio"
 # start_time="9.9461767555"
