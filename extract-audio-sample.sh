@@ -12,14 +12,15 @@ where:
     -h  show this help text
     -s  start time of the dialog to extract (in fractional seconds, default: beginning of input file)
     -e  end time of the dialog to extract (in fractional seconds, default: end of input file)
-    -i directory of the input shadowing audio file (default: 'inputs')
-    -p pattern of the input shadowing audio file. It can use 'unit' and 'section' variables 
+    -i  directory of the input shadowing audio file (default: 'inputs')
+    -p  pattern of the input shadowing audio file. It can use 'unit' and 'section' variables 
         (default: '*_Unit_${unit}_-_Section_${section}.mp3')
     -c  codec of the extracted dialog audio file (default: mp3)
-    -o directory to output the dialog file (default: 'outputs')
-    -P pattern of the extracted dialog audio file. 
+    -o  directory to output the dialog file (default: 'outputs')
+    -P  pattern of the extracted dialog audio file. 
         It can use 'unit', 'section', 'dialog' and 'codec' variables.
         (default: '${unit}-${section}-${dialog}.${codec}')
+    -v  verbose mode, mainly for ffmpeg
     "
 	echo "${usage}"
 }
@@ -39,7 +40,7 @@ output_dir="outputs"
 output_pattern='${unit}-${section}-${dialog}.${codec}'
 
 # TODO use silent mode when debug is done (prefix by ":"")
-while getopts "hs:e:i:p:c:o:P:" opt; do
+while getopts "hvs:e:i:p:c:o:P:" opt; do
 	case $opt in
 		h)
 			print_help
@@ -66,6 +67,9 @@ while getopts "hs:e:i:p:c:o:P:" opt; do
 		P)
 			output_pattern="${OPTARG}"
 			;;
+		v)
+			verbose="true"
+			;;
 		\?)
 			param_error "Invalid option: -${OPTARG}."
 			;;
@@ -88,7 +92,11 @@ fi
 eval input_path="${input_dir}/${input_pattern}"
 eval output_path="${output_dir}/${output_pattern}"
 
-ffmpeg_cmd="ffmpeg -hide_banner -loglevel panic -i ${input_path}"
+ffmpeg_cmd="ffmpeg -hide_banner -i ${input_path}"
+if [ -z "${verbose}" ]; then
+	ffmpeg_cmd="${ffmpeg_cmd} -loglevel panic"
+fi
+
 if [ ! -z "${start_time}" ]; then
 	ffmpeg_cmd="${ffmpeg_cmd} -ss ${start_time}"
 fi
