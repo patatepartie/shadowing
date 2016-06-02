@@ -85,24 +85,20 @@ if [ -z "${unit}" ] || [ -z "${section}" ] || [ -z "${dialog}" ]; then
     param_error "3 positional parameters needs to be set: UNIT SECTION DIALOG."
 fi
 
-eval out_path="${output_dir}/${output_pattern}"
+eval input_path="${input_dir}/${input_pattern}"
+eval output_path="${output_dir}/${output_pattern}"
 
-echo "${unit}-${section}-${dialog},${out_path}"
+ffmpeg_cmd="ffmpeg -hide_banner -loglevel panic -i ${input_path}"
+if [ ! -z "${start_time}" ]; then
+	ffmpeg_cmd="${ffmpeg_cmd} -ss ${start_time}"
+fi
 
-# source_dir="Audio"
-# start_time="9.9461767555"
-# end_time="13.3238884105"
-# duration=${end_time} - ${start_time}
-# page="2-1"
-# splits=(${page//-/ })
-# unit="${splits[0]}"
-# section="${splits[1]}"
-# dialog="${splits[2]}"
-# file_pattern="*_Unit_${unit}_-_Section_${section}.mp3"
-# source_file=`find ${source_dir} -name ${file_pattern}`
-# out_dir="Extracts"
-# codec="mp3"
-# out_file="${out_dir}/${unit}-${section}-${dialog}.${codec}"
+if [ ! -z "${end_time}" ]; then
+	ffmpeg_cmd="${ffmpeg_cmd} -to ${end_time}"
+fi
 
+ffmpeg_cmd="${ffmpeg_cmd} -acodec ${codec} ${output_path}"
 
-# ffmpeg -ss ${start_time} -to ${duration} -acodec ${codec} -i ${source_file} ${out_file}
+`${ffmpeg_cmd}`
+
+echo "${unit}-${section}-${dialog},${output_path}"
