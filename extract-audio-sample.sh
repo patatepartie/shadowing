@@ -38,7 +38,6 @@ codec="mp3"
 output_dir="outputs"
 output_pattern='${1}-${2}-${3}.${codec}'
 
-# TODO use silent mode when debug is done (prefix by ":"")
 while getopts "hvs:e:i:p:c:o:P:" opt; do
 	case $opt in
 		h)
@@ -81,7 +80,8 @@ done
 shift $((OPTIND-1))
 
 eval input_path="${input_dir}/${input_pattern}"
-eval output_path="${output_dir}/${output_pattern}"
+eval output_file="${output_pattern}"
+output_path="${output_dir}/${output_file}"
 
 ffmpeg_cmd="ffmpeg -hide_banner -i ${input_path}"
 if [ -z "${verbose}" ]; then
@@ -100,4 +100,4 @@ ffmpeg_cmd="${ffmpeg_cmd} -acodec ${codec} ${output_path}"
 
 `${ffmpeg_cmd}`
 
-echo "${unit}-${section}-${dialog},${output_path}"
+echo "${1}-${2}-${3},[sound:${output_file}]"
